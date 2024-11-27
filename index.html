@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Certificate Verification</title>
+</head>
+<body>
+    <h1>Certificate Verification</h1>
+    <form id="verification-form">
+        <label for="certificate-id">Certificate ID:</label>
+        <input type="text" id="certificate-id" name="certificate-id">
+        <button type="submit">Verify</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        const form = document.getElementById('verification-form');
+        const resultDiv = document.getElementById('result');
+
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const certificateId = document.getElementById('certificate-id').value;
+
+            fetch('/verify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ certificate_id: certificateId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    resultDiv.textContent = data.error;
+                } else {
+                    resultDiv.innerHTML = `
+                        <p>Name: ${data.name}</p>
+                        <p>Date of Issue: ${data.date_of_issue}</p>
+                        <p>Other Details: ${data.other_details}</p>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                resultDiv.textContent = 'An error occurred. Please try again.';
+            });
+        });
+    </script>
+</body>
+</html>
